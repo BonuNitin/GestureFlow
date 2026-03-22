@@ -1,0 +1,86 @@
+{
+    "Mapped_Gesture_1": {
+        "name": "Index Finger Only",
+        "label": "Either",
+        "fingers": [
+            0,
+            1,
+            0,
+            0,
+            0
+        ],
+        "action": "MOUSE MODE"
+    },
+    "Mapped_Gesture_2": {
+        "name": "Right Hand Peace",
+        "label": "Right",
+        "fingers": [
+            0,
+            1,
+            1,
+            0,
+            0
+        ],
+        "action": "FORWARD"
+    },
+    "Mapped_Gesture_3": {
+        "name": "Left Hand Peace",
+        "label": "Left",
+        "fingers": [
+            0,
+            1,
+            1,
+            0,
+            0
+        ],
+        "action": "REWIND"
+    },
+    "Mapped_Gesture_4": {
+        "name": "Right Hand (Index & Pinky)",
+        "label": "Right",
+        "fingers": [
+            0,
+            1,
+            0,
+            0,
+            1
+        ],
+        "action": "VOLUME_UP"
+    },
+    "Mapped_Gesture_5": {
+        "name": "Left Hand (Index & Pinky)",
+        "label": "Left",
+        "fingers": [
+            0,
+            1,
+            0,
+            0,
+            1
+        ],
+        "action": "VOLUME_DOWN"
+    },
+    "Mapped_Gesture_6": {
+        "name": "Thumb Only",
+        "label": "Either",
+        "fingers": [
+            1,
+            0,
+            0,
+            0,
+            0
+        ],
+        "action": "SINGLE & DOUBLE CLICK"
+    },
+    "None": {
+        "name": "None",
+        "label": "Either",
+        "fingers": [
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "action": "IDLE"
+    }
+}

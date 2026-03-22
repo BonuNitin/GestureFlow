@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gesture Flow | Home</title>
+    <!-- Import beautiful Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #03030a;
+            --primary: #00f0ff; /* Neon Cyan */
+            --secondary: #ff0055; /* Neon Pink/Magenta */
+            --text-main: #FFFFFF;
+            --text-muted: #8b8b9e;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Outfit', -apple-system, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Abstract glowing background orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: 0;
+            animation: float 10s infinite ease-in-out alternate;
+        }
+        .orb-1 {
+            width: 500px; height: 500px;
+            background: rgba(0, 240, 255, 0.15);
+            top: -100px; left: -100px;
+        }
+        .orb-2 {
+            width: 400px; height: 400px;
+            background: rgba(255, 0, 85, 0.15);
+            bottom: -50px; right: -50px;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(30px, -50px); }
+        }
+
+        /* Ambient grid */
+        .grid-bg {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+            pointer-events: none;
+            mask-image: radial-gradient(circle at center, black, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle at center, black, transparent 80%);
+        }
+        
+        /* Top Centered College Header */
+        .college-header-global {
+            position: absolute;
+            top: 2.5rem;
+            left: 0;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            z-index: 100;
+            animation: slideDown 0.8s ease forwards;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .college-logo-container {
+            background: transparent;
+            padding: 0;
+            transition: transform 0.3s ease;
+        }
+        
+        .college-logo-container:hover {
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        .college-logo {
+            height: 60px;
+            width: 60px;
+            display: block;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .college-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-main);
+            line-height: 1.4;
+            white-space: nowrap;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.8);
+            letter-spacing: 0.5px;
+        }
+
+        /* Premium removed glass Container */
+        .glass-panel {
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            padding: 5rem;
+            
+            background: transparent;
+            box-shadow: none;
+            border: none;
+            border-radius: 0;
+            
+            transform: translateY(30px);
+            opacity: 0;
+            animation: slideUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+        }
+
+        @keyframes slideUp {
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .app-branding {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 3.5rem;
+        }
+
+        .app-logo {
+            width: 140px;
+            height: 140px;
+            border-radius: 35%;
+            object-fit: cover;
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.3);
+            border: 2px solid rgba(0, 240, 255, 0.2);
+            animation: pulseGlow 4s infinite alternate;
+        }
+        
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 30px rgba(0, 240, 255, 0.2), 0 10px 20px rgba(255, 0, 85, 0.1); }
+            100% { box-shadow: 0 0 60px rgba(0, 240, 255, 0.4), 0 20px 40px rgba(255, 0, 85, 0.2); }
+        }
+
+        h1 {
+            font-size: 4.8rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #ffffff, #a0a0b0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        .highlight {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .description {
+            font-size: 1.35rem;
+            font-weight: 300;
+            color: var(--text-muted);
+            margin: 0;
+            max-width: 450px;
+            line-height: 1.5;
+        }
+
+        .btn-proceed {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 1.2rem 3.5rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #fff;
+            text-decoration: none;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50px;
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 15px 35px -5px rgba(255, 0, 85, 0.4);
+        }
+
+        .btn-proceed::before {
+            content: '';
+            position: absolute;
+            top: 2px; left: 2px; right: 2px; bottom: 2px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+            border-radius: 50px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .btn-proceed:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 40px -5px rgba(0, 240, 255, 0.5);
+            letter-spacing: 1px;
+        }
+
+        .btn-proceed:hover::before {
+            opacity: 1;
+        }
+
+        .arrow {
+            transition: transform 0.3s;
+        }
+        
+        .btn-proceed:hover .arrow {
+            transform: translateX(5px);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="grid-bg"></div>
+    
+    <!-- Top Left College Branding -->
+    <div class="college-header-global">
+        <div class="college-logo-container">
+            <img src="/static/images/college_logo.png" alt="College Logo" class="college-logo">
+        </div>
+        <div class="college-name">GAYATRI VIDYA PARISHAD COLLEGE FOR DEGREE AND PG COURSES(A)</div>
+    </div>
+    
+    <div class="glass-panel">
+        <!-- App Branding Section -->
+        <div class="app-branding">
+            <img src="/static/images/app_logo.png" alt="Gesture Flow Logo" class="app-logo">
+            <h1>Gesture <span class="highlight">Flow</span></h1>
+            <p class="description">Control your PC entirely with AI powered hand gestures.</p>
+        </div>
+
+        <!-- Proceed Button -->
+        <a href="/dashboard" class="btn-proceed">
+            Proceed to Settings <span class="arrow">&rarr;</span>
+        </a>
+    </div>
+
+</body>
+</html>

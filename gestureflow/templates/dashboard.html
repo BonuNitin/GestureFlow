@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gesture Flow Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00f0ff;
+            --secondary: #ff0055;
+            --bg-dark: #07070a;
+            --panel-bg: rgba(20, 20, 25, 0.4);
+            --text-light: #ffffff;
+            --text-muted: #8b8b9e;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            background-color: var(--bg-dark);
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+
+        /* Abstract glowing background */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -1;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+        .orb-1 {
+            width: 400px; height: 400px;
+            background: rgba(0, 240, 255, 0.15);
+            top: 10%; right: 0%;
+        }
+        .orb-2 {
+            width: 500px; height: 500px;
+            background: rgba(255, 0, 85, 0.12);
+            bottom: 0%; left: 0%;
+        }
+
+        /* Ambient grid */
+        .grid-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* Navbar Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 4rem;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo { height: 45px; width: auto; }
+
+        .title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -0.5px;
+            color: var(--text-light);
+            text-transform: capitalize;
+        }
+
+        .title span {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .college-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .college-name-small {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-align: right;
+            line-height: 1.3;
+            white-space: nowrap;
+        }
+
+        .college-logo-small {
+            height: 45px;
+            width: 45px;
+            border-radius: 50%;
+            background: transparent;
+            padding: 0;
+            object-fit: cover;
+        }
+
+        /* Main Dashboard Container */
+        .dashboard-container {
+            max-width: 900px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            animation: slideIn 0.5s ease forwards;
+        }
+
+        .dashboard-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+            animation: slideIn 0.7s ease forwards;
+        }
+
+        /* Row Configuration System */
+        .mapping-rows {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .mapping-row {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            background: var(--panel-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+            animation: slideIn 0.5s ease forwards;
+            transition: all 0.3s ease;
+        }
+
+        .mapping-row:hover {
+            border-color: rgba(0, 240, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .select-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .select-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        select {
+            appearance: none;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        /* Custom dropdown arrow hack */
+        .select-wrapper {
+            position: relative;
+        }
+        .select-wrapper::after {
+            content: "▼";
+            font-size: 0.8rem;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            pointer-events: none;
+        }
+
+        select:hover, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+        }
+
+        select:disabled {
+            color: rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        select option {
+            background-color: var(--bg-dark);
+            color: white;
+            font-weight: normal;
+        }
+        
+        select option:disabled {
+            color: rgba(255, 255, 255, 0.3);
+            font-style: italic;
+        }
+
+        .arrow-divider {
+            color: var(--primary);
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1.8rem;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+            opacity: 0.8;
+        }
+
+        .image-preview {
+            width: 90px;
+            height: 90px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem; /* Large Emoji size */
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+            margin-top: 1.8rem;
+        }
+
+        .mapping-row:hover .image-preview {
+            border-color: rgba(0, 240, 255, 0.4);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+            transform: scale(1.05);
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            color: var(--secondary);
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 0 1rem;
+            margin-top: 1.8rem;
+            line-height: 1;
+            opacity: 0.6;
+        }
+
+        .remove-btn:hover {
+            opacity: 1;
+            transform: scale(1.2);
+            text-shadow: 0 0 15px var(--secondary);
+        }
+
+        /* Buttons bottom area */
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .btn {
+            padding: 1.2rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 800;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            border: none;
+            font-family: inherit;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-add {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-add:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, var(--primary), #00a2ff);
+            box-shadow: 0 10px 25px -5px rgba(0, 240, 255, 0.4);
+            color: #000;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px -5px rgba(0, 240, 255, 0.6);
+        }
+
+        /* Custom Gesture Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: all; }
+        .modal-content {
+            background: var(--bg-dark); border: 1px solid rgba(0, 240, 255, 0.5);
+            border-radius: 20px; padding: 2.5rem; width: 450px; max-width: 90%;
+            box-shadow: 0 20px 50px rgba(0,240,255,0.2), inset 0 0 0 1px rgba(255,255,255,0.05);
+        }
+        .modal-title { font-size: 1.6rem; margin-bottom: 1.5rem; margin-top: 0; }
+        .finger-toggles { display: flex; justify-content: space-between; margin-bottom: 2rem; }
+        .ftg-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: white; border-radius: 12px; width: 60px; height: 60px;
+            font-size: 1.8rem; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .ftg-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); }
+        .ftg-btn.active { 
+            background: rgba(0,240,255,0.2); border-color: var(--primary); 
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); text-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        .modal-input {
+            width: 100%; box-sizing: border-box; padding: 1rem; 
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);
+            color: white; border-radius: 10px; margin-bottom: 1rem; font-family: inherit; font-size: 1rem;
+            outline: none; transition: border-color 0.2s;
+        }
+        .modal-input:focus { border-color: var(--primary); background: rgba(0, 240, 255, 0.05); }
+        .modal-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem; }
+        .modal-actions .btn { font-size: 1rem; padding: 0.8rem 1.5rem; border-radius: 10px; }
+
+    </style>
+</head>
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="grid-bg"></div>
+
+    <header>
+        <div class="brand">
+            <img src="/static/images/app_logo.png" alt="App Logo" class="logo" onerror="this.src='/static/images/app_logo.png'">
+            <h1 class="title">Gesture <span>Flow</span></h1>
+        </div>
+        <div class="college-info">
+            <div class="college-name-small">GAYATRI VIDYA PARISHAD COLLEGE FOR DEGREE AND PG COURSES(A)</div>
+            <img src="/static/images/college_logo.png" alt="College Logo" class="college-logo-small">
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <h2 class="dashboard-title">Dynamic Gesture Setup</h2>
+        <p class="dashboard-subtitle">Select a finger gesture, choose its output action, and the visual image will generate automatically. Duplicate choices are intelligently disabled.</p>
+
+        <div id="mappingRowsContainer" class="mapping-rows">
+            <!-- Rows injected by JavaScript -->
+        </div>
+
+        <div class="controls-row">
+            <button id="addMappingBtn" class="btn btn-add">+ Add Mapping Row</button>
+            <button id="saveProceedBtn" class="btn btn-save">Save & Proceed to Camera &rarr;</button>
+        </div>
+    </main>
+
+    <!-- Custom Gesture Modal -->
+    <div class="modal-overlay" id="customModal">
+        <div class="modal-content">
+            <h3 class="modal-title">Design Custom Shape</h3>
+            
+            <input type="text" id="customName" class="modal-input" placeholder="Name (e.g., My Spiderman Web)">
+            <input type="text" id="customIcon" class="modal-input" placeholder="Emoji Icon (e.g., 🕸️)" maxlength="2">
+            
+            <p style="color:var(--text-muted); font-size: 0.85rem; margin-bottom: 0.8rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1px;">Toggle Required Fingers:</p>
+            <div class="finger-toggles">
+                <button class="ftg-btn" data-idx="0" title="Thumb">👍</button>
+                <button class="ftg-btn" data-idx="1" title="Index">☝️</button>
+                <button class="ftg-btn" data-idx="2" title="Middle">🖕</button>
+                <button class="ftg-btn" data-idx="3" title="Ring">🖖</button>
+                <button class="ftg-btn" data-idx="4" title="Pinky">🤙</button>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn btn-add" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-save" onclick="saveCustomGesture()">Save Shape</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Preset Finger Gestures with emoji icons to act as images
+        let GESTURES = [
+            { id: "INDEX", name: "Index Finger Only", fingers: [0, 1, 0, 0, 0], icon: "☝️", label: "Either" },
+            { id: "PEACE_R", name: "Right Hand Peace", fingers: [0, 1, 1, 0, 0], icon: "✌️", label: "Right" },
+            { id: "PEACE_L", name: "Left Hand Peace", fingers: [0, 1, 1, 0, 0], icon: "✌️", label: "Left" },
+            { id: "THUMB", name: "Thumb Only", fingers: [1, 0, 0, 0, 0], icon: "👍", label: "Either" },
+            { id: "PINKY", name: "Pinky Finger Only", fingers: [0, 0, 0, 0, 1], icon: "🤙", label: "Either" },
+            { id: "HORNS_R", name: "Right Hand (Index & Pinky)", fingers: [0, 1, 0, 0, 1], icon: "🤘", label: "Right" },
+            { id: "HORNS_L", name: "Left Hand (Index & Pinky)", fingers: [0, 1, 0, 0, 1], icon: "🤘", label: "Left" },
+            { id: "FIST", name: "Closed Fist", fingers: [0, 0, 0, 0, 0], icon: "✊", label: "Either" }
+        ];
+
+        const ACTIONS = [
+            "MOUSE MODE", "SINGLE & DOUBLE CLICK", "RIGHT CLICK",
+            "FORWARD", "REWIND", "SPACE (PLAY/PAUSE)", "HALT SYSTEM", "VOLUME_UP", "VOLUME_DOWN"
+        ];
+
+        const container = document.getElementById('mappingRowsContainer');
+        const addBtn = document.getElementById('addMappingBtn');
+        const saveBtn = document.getElementById('saveProceedBtn');
+
+        // Modal State
+        let targetSelectForCustom = null;
+        let customFingers = [0, 0, 0, 0, 0];
+
+        // Finger Toggle Listeners for Modal
+        document.querySelectorAll('.ftg-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.toggle('active');
+                const idx = parseInt(this.getAttribute('data-idx'));
+                customFingers[idx] = this.classList.contains('active') ? 1 : 0;
+            });
+        });
+
+        function createRow(gestureId = "", actionId = "") {
+            const rowId = "row_" + Date.now() + Math.floor(Math.random() * 1000);
+            
+            const rowEl = document.createElement('div');
+            rowEl.className = 'mapping-row';
+            rowEl.id = rowId;
+
+            // Generate gesture options
+            let gestureOptions = `<option value="" disabled ${!gestureId ? 'selected' : ''}>-- Select Finger Shape --</option>`;
+            GESTURES.forEach(g => {
+                gestureOptions += `<option value="${g.id}" ${gestureId === g.id ? 'selected' : ''}>${g.name}</option>`;
+            });
+            gestureOptions += `<option value="ADD_CUSTOM" style="color: var(--primary); font-weight: 800;">+ Define Custom Shape...</option>`;
+
+            // Generate action options
+            let actionOptions = `<option value="" disabled ${!actionId ? 'selected' : ''}>-- Select Output Action --</option>`;
+            ACTIONS.forEach(a => {
+                actionOptions += `<option value="${a}" ${actionId === a ? 'selected' : ''}>${a}</option>`;
+            });
+
+            // Get initial icon
+            const initialIcon = gestureId ? GESTURES.find(g => g.id === gestureId).icon : "💡";
+
+            rowEl.innerHTML = `
+                <div class="select-group">
+                    <span class="select-label">1. Select Gesture Fingers</span>
+                    <div class="select-wrapper">
+                        <select class="gesture-select" onchange="handleSelectChange(this)">
+                            ${gestureOptions}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="arrow-divider">&rarr;</div>
+
+                <div class="select-group">
+                    <span class="select-label">2. Select Bound Action</span>
+                    <div class="select-wrapper">
+                        <select class="action-select" onchange="handleSelectChange(this)">
+                            ${actionOptions}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="image-preview">${initialIcon}</div>
+                
+                <button class="remove-btn" title="Remove row" onclick="removeRow('${rowId}')">&times;</button>
+            `;
+
+            container.appendChild(rowEl);
+            updateOptionsConstraints();
+        }
+
+        window.removeRow = function(rowId) {
+            const el = document.getElementById(rowId);
+            if(el) el.remove();
+            updateOptionsConstraints();
+        }
+
+        window.handleSelectChange = function(selectElem) {
+            if (selectElem && selectElem.classList.contains('gesture-select') && selectElem.value === 'ADD_CUSTOM') {
+                targetSelectForCustom = selectElem;
+                selectElem.value = ""; // Reset temporarily until they save
+                openModal();
+                return;
+            }
+
+            // Update icons immediately beside the dropdowns
+            const rows = document.querySelectorAll('.mapping-row');
+            rows.forEach(row => {
+                const gestureVal = row.querySelector('.gesture-select').value;
+                const iconContainer = row.querySelector('.image-preview');
+                if(gestureVal && gestureVal !== 'ADD_CUSTOM') {
+                    const matched = GESTURES.find(g => g.id === gestureVal);
+                    if(matched) iconContainer.innerText = matched.icon;
+                } else {
+                    iconContainer.innerText = "💡";
+                }
+            });
+
+            // Re-run constraints so users can't pick duplicates
+            updateOptionsConstraints();
+        }
+
+        function openModal() {
+            document.getElementById('customName').value = '';
+            document.getElementById('customIcon').value = '';
+            customFingers = [0,0,0,0,0];
+            document.querySelectorAll('.ftg-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('customModal').classList.add('show');
+        }
+
+        window.closeModal = function() {
+            document.getElementById('customModal').classList.remove('show');
+            targetSelectForCustom = null;
+            updateOptionsConstraints(); // Force refresh constraints
+        }
+
+        window.saveCustomGesture = function() {
+            const name = document.getElementById('customName').value.trim();
+            const icon = document.getElementById('customIcon').value.trim() || "✨";
+            
+            if(!name) { 
+                alert("Please enter a name for your gesture!"); 
+                return; 
+            }
+            
+            const customId = "CUST_" + Date.now();
+            
+            GESTURES.push({
+                id: customId,
+                name: "★ " + name, // Mark as custom
+                fingers: [...customFingers],
+                icon: icon
+            });
+            
+            // Re-inject the updated GESTURES array into ALL dropdowns
+            const rows = document.querySelectorAll('.mapping-row');
+            rows.forEach(row => {
+                const gSelect = row.querySelector('.gesture-select');
+                const currentVal = gSelect.value;
+                
+                let newOpts = '<option value="" disabled>-- Select Finger Shape --</option>';
+                GESTURES.forEach(g => {
+                    newOpts += `<option value="${g.id}">${g.name}</option>`;
+                });
+                newOpts += `<option value="ADD_CUSTOM" style="color: var(--primary); font-weight: 800;">+ Define Custom Shape...</option>`;
+                
+                gSelect.innerHTML = newOpts;
+                gSelect.value = currentVal; // Restore their previous selection safely
+            });
+            
+            // Assign the new gesture to the select that spawned the modal
+            if(targetSelectForCustom) {
+                targetSelectForCustom.value = customId;
+                targetSelectForCustom = null;
+            }
+            
+            closeModal();
+            handleSelectChange(); // Re-trigger image update and constraint checks
+        }
+
+        function updateOptionsConstraints() {
+            // Collect all selected gestures and actions
+            const selectedGestures = [];
+            const selectedActions = [];
+
+            const rows = document.querySelectorAll('.mapping-row');
+            rows.forEach(row => {
+                const gVal = row.querySelector('.gesture-select').value;
+                const aVal = row.querySelector('.action-select').value;
+                if(gVal) selectedGestures.push(gVal);
+                if(aVal) selectedActions.push(aVal);
+            });
+
+            // Disable options in all dropdowns if they are selected ELSEWHERE
+            rows.forEach(row => {
+                const gSelect = row.querySelector('.gesture-select');
+                const aSelect = row.querySelector('.action-select');
+                
+                // Disable gesture options
+                Array.from(gSelect.options).forEach(opt => {
+                    if(!opt.value || opt.value === 'ADD_CUSTOM') return; 
+                    
+                    if(selectedGestures.includes(opt.value) && opt.value !== gSelect.value) {
+                        opt.disabled = true;
+                    } else {
+                        opt.disabled = false;
+                    }
+                });
+
+                // Disable action options
+                Array.from(aSelect.options).forEach(opt => {
+                    if(!opt.value) return;
+                    if(selectedActions.includes(opt.value) && opt.value !== aSelect.value) {
+                        opt.disabled = true;
+                    } else {
+                        opt.disabled = false;
+                    }
+                });
+            });
+        }
+
+        addBtn.addEventListener('click', () => {
+            createRow();
+        });
+
+        saveBtn.addEventListener('click', async () => {
+            const rows = document.querySelectorAll('.mapping-row');
+            const newConfig = {};
+            
+            let counter = 1;
+
+            rows.forEach(row => {
+                const gVal = row.querySelector('.gesture-select').value;
+                const aVal = row.querySelector('.action-select').value;
+                
+                if(gVal && gVal !== 'ADD_CUSTOM' && aVal) {
+                    const match = GESTURES.find(g => g.id === gVal);
+                    newConfig[`Mapped_Gesture_${counter}`] = {
+                        name: match.name.replace('★ ', ''), // Clean up the custom star
+                        label: match.label || "Either",
+                        fingers: match.fingers,
+                        action: aVal
+                    };
+                    counter++;
+                }
+            });
+
+            // Ensure IDLE is naturally handled or pass a None state securely
+            newConfig["None"] = {
+                name: "None",
+                label: "Either",
+                fingers: [0,0,0,0,0],
+                action: "IDLE"
+            };
+
+            // Send to backend and redirect
+            saveBtn.innerText = "Saving...";
+            try {
+                const response = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newConfig)
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/camera';
+                } else {
+                    alert("Failed to save. Check server.");
+                    saveBtn.innerText = "Save & Proceed to Camera \u2192";
+                }
+            } catch (error) {
+                console.error("Save error:", error);
+                alert("Failed to save configuration.");
+                saveBtn.innerText = "Save & Proceed to Camera \u2192";
+            }
+        });
+
+        // Initialize with realistic existing settings
+        window.onload = () => {
+            createRow("INDEX", "MOUSE MODE");
+            createRow("PEACE_R", "FORWARD");
+            createRow("PEACE_L", "REWIND");
+            createRow("HORNS_R", "VOLUME_UP");
+            createRow("HORNS_L", "VOLUME_DOWN");
+            createRow("THUMB", "SINGLE & DOUBLE CLICK");
+        };
+    </script>
+</body>
+</html>
